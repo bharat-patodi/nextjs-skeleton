@@ -129,50 +129,131 @@ export default function LoginPage() {
   )
 }
 ```
-- [ ] Either use Hooks (or AuthProvider) or a layout.tsx to protect pages. Layout page will be `app/(protected)/layout.tsx`.
+- [ ] Use AuthProvider `components/AuthProvider.tsx`.
 ```
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import type { User } from '@supabase/supabase-js'
+import type { Session, User } from '@supabase/supabase-js'
 
-export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+interface AuthContextType {
+  user: User | null
+  session: Session | null
+  loading: boolean
+  signOut: () => Promise<void>
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
 
   useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession()
-      if (!data.session) {
-        router.replace('/login')
-      } else {
+    const getSession = async () => {
+      const { data, error } = await supabase.auth.getSession()
+      if (data?.session) {
+        setSession(data.session)
         setUser(data.session.user)
+      } else {
+        setSession(null)
+        setUser(null)
       }
       setLoading(false)
     }
 
-    checkSession()
-  }, [router])
+    getSession()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+      setUser(session?.user ?? null)
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
+
+  const signOut = async () => {
+    await supabase.auth.signOut()
+  }
+
+  return (
+    <AuthContext.Provider value={{ user, session, loading, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
+}
+```
+- [ ] Wrap the app with AuthProvider. `app/layout.tsx`
+```
+import './globals.css'
+import { AuthProvider } from '@/components/AuthProvider'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
+    </html>
+  )
+}
+```
+- [ ] Create ProtectedLayout to Block Unauthorized Users at `app/(protected)/layout.tsx`
+```
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/components/AuthProvider'
+
+export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace('/login')
+    }
+  }, [loading, user, router])
 
   if (loading) return <p>Loading...</p>
 
   return <>{children}</>
 }
+
 ```
 - [ ] The structure will look like this:
 ```
 app/
+├─ layout.tsx               ← wraps entire app with AuthProvider
 ├─ (auth)/
 │  ├─ login/
 │  ├─ signup/
-├─ (protected)/
-│  ├─ layout.tsx   ← central session check here
-│  ├─ dashboard/
+├─ (protected)/             ← all routes here are guarded
+│  ├─ layout.tsx            ← ProtectedLayout (redirects if not logged in)
 │  ├─ profile/
-│  ├─ settings/
+│  ├─ dashboard/
+components/
+├─ AuthProvider.tsx         ← global auth context
+lib/
+├─ supabase.ts        ← your Supabase client
+
 ```
 
 
