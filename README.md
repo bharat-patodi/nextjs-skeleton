@@ -258,5 +258,7 @@ lib/
 - [ ] Vercel deployment will need the env vars. Remember to upload.
 - [ ] CRUD
 - [ ] Create the schema and save in supabase/schema.sql. Use sample repo for guide. Take help from AI.
-
-
+- [ ] Use schema to create the tables in Supabase. Use supabase CLI command `supabase db push
+` or use Supabase UI to upload schema into SQL editor.
+- [ ] Add design.md with Design choice for the project.
+- [ ] Add architecture.md with help from sample.
