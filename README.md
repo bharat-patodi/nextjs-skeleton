@@ -255,6 +255,6 @@ lib/
 ├─ supabase.ts        ← your Supabase client
 
 ```
-
+- [ ] Vercel deployment will need the env vars. Remember to upload.
 
 
