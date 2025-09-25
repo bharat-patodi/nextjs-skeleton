@@ -1,5 +1,7 @@
 # Steps
 
+<!-- Sample: https://github.com/bharat-patodi/nsrl-crm-nextjs -->
+
 - [ ] `npx create-next-app@latest . --typescript --eslint --app --src-dir --import-alias "@/*" --yes`. Look into integrating supabase at start with `npx create-next-app -e with-supabase`. This can help with auth too.
 - [ ] `npm run dev` and check on [http://localhost:3000](http://localhost:3000)
 - [ ] `Ask AI to create all necessary html pages. For CSS, see NSRL CRM project. Be sure to
@@ -259,6 +261,9 @@ lib/
 - [ ] CRUD
 - [ ] Create the schema and save in supabase/schema.sql. Use sample repo for guide. Take help from AI.
 - [ ] Use schema to create the tables in Supabase. Use supabase CLI command `supabase db push
-` or use Supabase UI to upload schema into SQL editor.
+` or use Supabase UI to upload schema into SQL editor. Rename the SQL query. Run it.
+- [ ] Confirm that all expected tables are listed, columns match what was defined. Foreign keys are correctly linked.
+- [ ] Seed minimal data to test relationships: Create a seed/seed.sql file. Take help from AI for seeding data for this schema.
+- [ ] Create a reset.sql file in seed/reset.sql file. Take help from sample repo.
 - [ ] Add design.md with Design choice for the project.
 - [ ] Add architecture.md with help from sample.
