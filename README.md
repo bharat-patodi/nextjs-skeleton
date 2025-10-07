@@ -267,3 +267,13 @@ lib/
 - [ ] Create a reset.sql file in seed/reset.sql file. Take help from sample repo.
 - [ ] Add design.md with Design choice for the project.
 - [ ] Add architecture.md with help from sample.
+- [ ] RLS Setup: Enable Row Level Security on all tables
+- [ ] RLS Policies: Add policy to allow users to read their own profile
+- [ ] RLS Policies: Add policy for users to access their organization’s data
+- [ ] RLS Policies: Find out all other RLS policies and enable them
+- [ ] Save all RLS policies in a file called `lib/supabase/rls/enable-and-policies.sql`.
+- [ ] Profile Sync: Create trigger to delete profiles with user deletion
+- [ ] Default Org:
+- [ ] Add one organization in the database. All users will automatically be assigned to this org at signup. CRUD and RLS will work for this one org. Save the default_org.sql in sql folder.
+- [ ] Default Admin: Sign up with your own email. Run default_admin.sql and make yourself the default admin. Save default_admin to sql folder.
+- [ ] Modify Trigger to Assign manager Role by Default. Overwrite the profile_insert.sql file. Add the API route /app/api/auth/signup/route.ts to handle this.
